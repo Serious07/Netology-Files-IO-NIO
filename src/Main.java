@@ -1,7 +1,10 @@
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
     private static Scanner scanner;
+
+    private static Basket basket;
 
     private static Product[] products = {
             new Product("Молоко", 50),
@@ -9,9 +12,9 @@ public class Main {
             new Product("Гречневая крупа", 80),
     };
 
-    private static int[] amountOfPurchasedProducts = new int[products.length];
+    public static final String SAVE_FILE_NAME = "basket.txt";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         init();
 
         scanner = new Scanner(System.in);
@@ -33,16 +36,22 @@ public class Main {
                 int productIndex = Integer.parseInt(strNumbers[0]);
                 int productsAmount = Integer.parseInt(strNumbers[1]);
 
-                amountOfPurchasedProducts[productIndex - 1] += productsAmount;
+                basket.addToCart(productIndex - 1, productsAmount);
+                basket.saveTxt(new File(SAVE_FILE_NAME));
             }
         }
 
-        showResults();
+        basket.printCart();
     }
 
-    public static void init() {
-        for (int i = 0; i < amountOfPurchasedProducts.length; i++) {
-            amountOfPurchasedProducts[i] = 0;
+    public static void init() throws IOException {
+        File f = new File(SAVE_FILE_NAME);
+
+        if(f.exists()){
+            basket = Basket.loadFromTxtFile(f);
+        } else {
+            basket = new Basket(products);
+            basket.saveTxt(f);
         }
     }
 
@@ -52,25 +61,5 @@ public class Main {
         for (int i = 0; i < products.length; i++) {
             System.out.println((i + 1) + ". " + products[i].toString());
         }
-    }
-
-    public static void showResults() {
-        System.out.println("Ваша корзина:");
-
-        int sum = 0;
-
-        for (int i = 0; i < amountOfPurchasedProducts.length; i++) {
-            if (amountOfPurchasedProducts[i] > 0) {
-                System.out.println(products[i].title + " " +
-                        amountOfPurchasedProducts[i] + " шт " +
-                        products[i].price + " руб/шт " +
-                        (amountOfPurchasedProducts[i] * products[i].price) +
-                        " руб в сумме");
-
-                sum += amountOfPurchasedProducts[i] * products[i].price;
-            }
-        }
-
-        System.out.println("Итого " + sum + " руб");
     }
 }
