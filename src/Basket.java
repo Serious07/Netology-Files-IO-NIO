@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Basket {
+public class Basket implements Serializable {
     private List<Product> products;
 
     private List<Integer> amountOfPurchasedProducts;
@@ -67,6 +67,25 @@ public class Basket {
 
         result = new Basket(products);
         result.setAmountOfPurchasedProducts(amountOfPurchasedProducts);
+
+        return result;
+    }
+
+    public void saveBin(File file) throws IOException {
+        try(FileOutputStream fos = new FileOutputStream(file)){
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+        }
+    }
+
+    public static Basket loadFromBinFile(File file) throws IOException, ClassNotFoundException {
+        Basket result = null;
+
+        try(FileInputStream fis = new FileInputStream(file)){
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            result = (Basket) ois.readObject();
+        }
 
         return result;
     }

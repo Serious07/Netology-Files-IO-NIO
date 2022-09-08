@@ -12,9 +12,9 @@ public class Main {
             new Product("Гречневая крупа", 80),
     };
 
-    public static final String SAVE_FILE_NAME = "basket.txt";
+    public static final String SAVE_FILE_NAME = "basket.bin";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         init();
 
         scanner = new Scanner(System.in);
@@ -37,21 +37,21 @@ public class Main {
                 int productsAmount = Integer.parseInt(strNumbers[1]);
 
                 basket.addToCart(productIndex - 1, productsAmount);
-                basket.saveTxt(new File(SAVE_FILE_NAME));
+                basket.saveBin(new File(SAVE_FILE_NAME));
             }
         }
 
         basket.printCart();
     }
 
-    public static void init() throws IOException {
+    public static void init() throws IOException, ClassNotFoundException {
         File f = new File(SAVE_FILE_NAME);
 
         if(f.exists()){
-            basket = Basket.loadFromTxtFile(f);
+            basket = Basket.loadFromBinFile(f);
         } else {
             basket = new Basket(products);
-            basket.saveTxt(f);
+            basket.saveBin(f);
         }
     }
 
