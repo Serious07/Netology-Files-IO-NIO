@@ -5,7 +5,6 @@ import java.util.Scanner;
 
 public class Main {
     private static Scanner scanner;
-
     private static Basket basket;
     private static ClientLog clientLog;
 
@@ -15,9 +14,9 @@ public class Main {
             new Product("Гречневая крупа", 80),
     };
 
-    public static final String SAVE_FILE_NAME = "basket.txt";
-    public static final String JSON_SAVE_FILE_NAME = "basket.json";
-    private static final String SAVE_LOGS_NAME = "log.csv";
+    public static final String defaultXmlFilePath = "shop.xml";
+
+    private static Options options;
 
     public static void main(String[] args) throws IOException {
         init();
@@ -42,30 +41,72 @@ public class Main {
                 int productsAmount = Integer.parseInt(strNumbers[1]);
 
                 basket.addToCart(productIndex - 1, productsAmount);
-                clientLog.log(productIndex, productsAmount);
 
-                //basket.saveTxt(new File(SAVE_FILE_NAME));
-                basket.saveJson(new File(JSON_SAVE_FILE_NAME));
+                // Logging
+                if(options.isLogEnabled()) {
+                    clientLog.log(productIndex, productsAmount);
+                }
+
+                // Save data
+                if(options.isSaveEnabled()) {
+                    switch (options.getSaveFormat()) {
+                        case "text":
+                            basket.saveTxt(new File(options.getSaveFileName()));
+                            break;
+                        case "json":
+                            basket.saveJson(new File(options.getSaveFileName()));
+                            break;
+                    }
+                }
             }
         }
 
-        clientLog.exportAsCSV(new File(SAVE_LOGS_NAME));
+        if(options.isLogEnabled()) {
+            clientLog.exportAsCSV(new File(options.getLogFileName()));
+        }
+
         basket.printCart();
     }
 
     public static void init() throws IOException {
-        //File f = new File(SAVE_FILE_NAME);
-        File f = new File(JSON_SAVE_FILE_NAME);
+        options = new Options(new File(defaultXmlFilePath));
 
-        clientLog = new ClientLog();
+        File f = new File(options.getLoadFileName());
+
+        if(options.isLogEnabled()) {
+            clientLog = new ClientLog();
+        }
 
         if(f.exists()){
-            //basket = Basket.loadFromTxtFile(f);
-            basket = Basket.loadFromJsonFile(f);
+            if(options.isLoadEnabled()) {
+                switch (options.getLoadFormat()) {
+                    case "text":
+                        basket = Basket.loadFromTxtFile(f);
+                        break;
+                    case "json":
+                        basket = Basket.loadFromJsonFile(f);
+                        break;
+                }
+            } else{
+                basket = new Basket(products);
+                initSave(f);
+            }
         } else {
             basket = new Basket(products);
-            //basket.saveTxt(f);
-            basket.saveJson(f);
+            initSave(f);
+        }
+    }
+
+    private static void initSave(File f) throws IOException {
+        if(options.isSaveEnabled()){
+            switch (options.getSaveFormat()){
+                case "text":
+                    basket.saveTxt(f);
+                    break;
+                case "json":
+                    basket.saveJson(f);
+                    break;
+            }
         }
     }
 
