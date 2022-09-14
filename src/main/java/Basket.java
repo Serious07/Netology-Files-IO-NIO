@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -6,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Basket {
-    private List<Product> products;
+public class Basket implements Serializable {
+    public List<Product> products;
 
-    private List<Integer> amountOfPurchasedProducts;
+    public List<Integer> amountOfPurchasedProducts;
 
     public Basket(Product[] products){
         this.products = Arrays.asList(products);
@@ -31,6 +34,30 @@ public class Basket {
 
     public void addToCart(int productNum, int amount){
         amountOfPurchasedProducts.set(productNum, amountOfPurchasedProducts.get(productNum) + amount);
+    }
+
+    public void saveJson(File jsonFile) throws IOException{
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        try(PrintWriter printWriter = new PrintWriter(jsonFile)){
+            printWriter.println(gson.toJson(this));
+        }
+    }
+
+    public static Basket loadFromJsonFile(File textFile) throws IOException{
+        Basket result;
+
+        ArrayList<Product> products = new ArrayList<>();
+        ArrayList<Integer> amountOfPurchasedProducts = new ArrayList<>();
+
+        String jsonFile = Files.readString(Paths.get(textFile.getPath()), StandardCharsets.UTF_8);
+
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        result = gson.fromJson(jsonFile, Basket.class);
+
+        return result;
     }
 
     public void saveTxt(File textFile) throws IOException {

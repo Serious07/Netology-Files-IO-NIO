@@ -1,3 +1,5 @@
+import Loging.ClientLog;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -5,6 +7,7 @@ public class Main {
     private static Scanner scanner;
 
     private static Basket basket;
+    private static ClientLog clientLog;
 
     private static Product[] products = {
             new Product("Молоко", 50),
@@ -13,6 +16,8 @@ public class Main {
     };
 
     public static final String SAVE_FILE_NAME = "basket.txt";
+    public static final String JSON_SAVE_FILE_NAME = "basket.json";
+    private static final String SAVE_LOGS_NAME = "log.csv";
 
     public static void main(String[] args) throws IOException {
         init();
@@ -37,21 +42,30 @@ public class Main {
                 int productsAmount = Integer.parseInt(strNumbers[1]);
 
                 basket.addToCart(productIndex - 1, productsAmount);
-                basket.saveTxt(new File(SAVE_FILE_NAME));
+                clientLog.log(productIndex, productsAmount);
+
+                //basket.saveTxt(new File(SAVE_FILE_NAME));
+                basket.saveJson(new File(JSON_SAVE_FILE_NAME));
             }
         }
 
+        clientLog.exportAsCSV(new File(SAVE_LOGS_NAME));
         basket.printCart();
     }
 
     public static void init() throws IOException {
-        File f = new File(SAVE_FILE_NAME);
+        //File f = new File(SAVE_FILE_NAME);
+        File f = new File(JSON_SAVE_FILE_NAME);
+
+        clientLog = new ClientLog();
 
         if(f.exists()){
-            basket = Basket.loadFromTxtFile(f);
+            //basket = Basket.loadFromTxtFile(f);
+            basket = Basket.loadFromJsonFile(f);
         } else {
             basket = new Basket(products);
-            basket.saveTxt(f);
+            //basket.saveTxt(f);
+            basket.saveJson(f);
         }
     }
 
