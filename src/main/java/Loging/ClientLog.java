@@ -21,7 +21,7 @@ public class ClientLog {
             writer.writeNext(firstRow.split(","));
 
             for(ProductPair productPair : loggedData){
-                writer.writeNext(productPair.toString().split(","));
+                writer.writeNext(new String[] {String.valueOf(productPair.getProductIndex()), String.valueOf(productPair.getProductAmount())});
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

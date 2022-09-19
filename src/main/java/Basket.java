@@ -19,7 +19,7 @@ public class Basket implements Serializable {
         init();
     }
 
-    public Basket(ArrayList<Product> products){
+    public Basket(List<Product> products){
         this.products = new ArrayList<>(products);
         init();
     }
@@ -48,9 +48,6 @@ public class Basket implements Serializable {
     public static Basket loadFromJsonFile(File textFile) throws IOException{
         Basket result;
 
-        ArrayList<Product> products = new ArrayList<>();
-        ArrayList<Integer> amountOfPurchasedProducts = new ArrayList<>();
-
         String jsonFile = Files.readString(Paths.get(textFile.getPath()), StandardCharsets.UTF_8);
 
         GsonBuilder builder = new GsonBuilder();
@@ -74,8 +71,8 @@ public class Basket implements Serializable {
 
     public static Basket loadFromTxtFile(File textFile) throws IOException{
         Basket result;
-        ArrayList<Product> products = new ArrayList<>();
-        ArrayList<Integer> amountOfPurchasedProducts = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+        List<Integer> amountOfPurchasedProducts = new ArrayList<>();
 
         List<String> lines = Files.readAllLines(Paths.get(textFile.getName()), StandardCharsets.UTF_8);
 
